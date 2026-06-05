@@ -2,7 +2,7 @@
 **A Student Project for Predicting Football Games Based off Game Data and Analysis via an AI Agent.**
 
 ## How it works
-Through [Football-Data.co.uk](Football-Data.co.uk) we're able to get CSV files containing historical and current match results.   Using that data, with Maher Poisson inspired prediction model[^1] we are able to to predict the results of future games that the end user specifies.  
+Through [Football-Data.co.uk](Football-Data.co.uk) we're able to get CSV files containing historical and current match results.   Using that data, with a Maher Poisson inspired prediction model[^1] we are able to to predict the results of future games that the end user specifies.  
 For the AI powered feature, through ChatGPT's API we're get an explaination on why this result is likely.
 [^1]: Changes made to this model to include exponential weighting so recent matches matter more.
 
@@ -30,7 +30,7 @@ https://github.com/user-attachments/assets/d85c8ed8-30f2-4bcb-a4ee-7054420b32a3
 
 
 ## Research Paper
-[Maher, M. J. (1982). "Modelling association football scores."](http://www.90minut.pl/misc/maher.pdf) The paper models football scores using Poisson distributions and team attack/defense strengths. We
+[Maher, M. J. (1982). "Modelling association football scores."](http://www.90minut.pl/misc/maher.pdf) The paper models football scores using Poisson distributions and team attack/defense strengths.[^1]
 
 ## AI Use and Agent Reflection
 *We did not use the AI as the main predictor. The prediction comes from the statistical model trained on former soccer results. The AI API is used only to explain the prediction in a more understandable way.*
