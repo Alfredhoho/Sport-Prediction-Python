@@ -8,7 +8,7 @@ For the AI powered feature, through ChatGPT's API we're get an explaination on w
 
 
 ## How to Run it Locally
-
+```bash
 cd backend  
 python -m venv .venv  
 source .venv/bin/activate  
@@ -16,8 +16,9 @@ pip install -r requirements.txt
 cp .env.example .env  
 python scripts/download_football_data.py  
 uvicorn app.main:app --reload  
+```
 
-Open frontend/index.html and use http://127.0.0.1:8000 as the backend URL.
+Open `frontend/index.html` and use `http://127.0.0.1:8000` as the backend URL.
 
 ## Video Demo
 
