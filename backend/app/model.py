@@ -49,7 +49,6 @@ class SoccerPoissonModel:
 
         df = df.copy()
         if "League" not in df.columns:
-            # Football-Data.co.uk uses Div; keep a friendly League field for the frontend.
             df["League"] = df["Div"] if "Div" in df.columns else "Unknown"
         if "Date" in df.columns:
             df["Date"] = pd.to_datetime(df["Date"], errors="coerce", dayfirst=True)
@@ -70,10 +69,8 @@ class SoccerPoissonModel:
 
         latest_date = df.loc[dated, "Date"].max()
         age_days = (latest_date - df["Date"]).dt.days
-        # Missing dates keep a small but nonzero neutral weight.
         age_days = age_days.fillna(self.half_life_days * 2).clip(lower=0)
         df["weight"] = 0.5 ** (age_days / self.half_life_days)
-        # Avoid tiny weights making old matches totally irrelevant in small demos.
         df["weight"] = df["weight"].clip(lower=0.05, upper=1.0)
         return df
 
@@ -85,7 +82,6 @@ class SoccerPoissonModel:
         return float((values * weights).sum() / total_weight)
 
     def _weighted_rate(self, values: pd.Series, weights: pd.Series, smoothing_value: float) -> float:
-        # One weighted pseudo-match prevents zeros for teams with limited data.
         return float(((values * weights).sum() + smoothing_value) / (weights.sum() + 1.0))
 
     def _build_profiles(self) -> dict[str, TeamProfile]:
