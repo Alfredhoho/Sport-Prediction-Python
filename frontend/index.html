@@ -1,177 +1,100 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepMatch AI - Parametric Simulation Studio</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 30px 20px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 750px; background-color: #1e293b; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid #334155; }
-        h1 { text-align: center; color: #38bdf8; margin: 0 0 5px 0; font-size: 26px; }
-        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 25px; font-size: 13px; }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FormGuide FC</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">APCSA full-stack AI example</p>
+        <h1>FormGuide FC</h1>
+      </div>
+      <p class="tagline">European match predictor powered by historical results, recency weighting, and a short AI match note.</p>
+    </header>
 
-        .panel { background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
-        .grid-2 { display: flex; gap: 15px; margin-bottom: 15px; }
-        .form-group { flex: 1; display: flex; flex-direction: column; }
-        label { margin-bottom: 6px; font-weight: 600; color: #cbd5e1; font-size: 13px; }
-        input[type="text"], select { width: 100%; padding: 10px; background-color: #1e293b; border: 1px solid #475569; border-radius: 6px; color: #f8fafc; font-size: 14px; box-sizing: border-box; }
+    <main class="layout">
+      <section class="panel control-panel">
+        <h2>Match setup</h2>
+        <p class="intro">
+          Choose a home and away side. The Python backend loads Football-Data.co.uk results from
+          <code>downloaded_matches.csv</code>, weights newer matches more heavily, and runs a Poisson score model.
+        </p>
 
-        .slider-container { margin-bottom: 12px; }
-        .slider-label-row { display: flex; justify-content: space-between; color: #94a3b8; font-size: 12px; margin-top: 4px; }
-        input[type="range"] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
-
-        button { width: 100%; padding: 12px; background-color: #0ea5e9; border: none; border-radius: 6px; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-        button:hover { background-color: #0284c7; }
-        button:disabled { background-color: #475569; cursor: not-allowed; }
-
-        .workspace-layout { display: none; }
-        .output-box { background: #0f172a; border-left: 4px solid #38bdf8; padding: 20px; border-radius: 8px; margin-bottom: 20px; line-height: 1.6; font-size: 14px; overflow-y: auto; max-height: 400px; }
-
-        .modifier-row { display: flex; gap: 10px; }
-        .modifier-row input { flex: 1; }
-        .modifier-row button { width: auto; padding: 0 20px; }
-
-        .loader { display: none; text-align: center; color: #38bdf8; font-weight: 500; font-size: 13px; margin: 15px 0; }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-</head>
-<body>
-
-<div class="app-container">
-    <h1>⚽ DeepMatch AI</h1>
-    <div class="subtitle">Parametric Simulation Workspace & Strategic Modeling Suite</div>
-
-    <div id="setupInterface" class="panel">
-        <div class="grid-2">
-            <div class="form-group"><label>Home Club</label><input type="text" id="homeTeam" placeholder="e.g., Chelsea"></div>
-            <div class="form-group"><label>Away Club</label><input type="text" id="awayTeam" placeholder="e.g., Arsenal"></div>
+        <label for="apiBase">Backend API URL</label>
+        <div class="api-row">
+          <input id="apiBase" value="http://127.0.0.1:8000" />
+          <button id="loadTeamsBtn" class="secondary">Reload teams</button>
         </div>
 
-        <div class="slider-container">
-            <label>Recency Bias Damping Factor (<span id="recencyVal">0.5</span>)</label>
-            <input type="range" id="recencyBias" min="0.1" max="1.0" step="0.05" value="0.5" oninput="document.getElementById('recencyVal').innerText=this.value">
-            <div class="slider-label-row"><span>Equal Weighting</span><span>Prioritize Recent Form</span></div>
+        <div class="team-card">
+          <label>
+            Home team
+            <select id="homeTeam"></select>
+          </label>
+          <label>
+            Away team
+            <select id="awayTeam"></select>
+          </label>
         </div>
 
-        <div class="slider-container">
-            <label>Home-Field Advantage Coefficient (<span id="homeVal">1.15</span>)</label>
-            <input type="range" id="homeAdvantage" min="1.0" max="1.5" step="0.05" value="1.15" oninput="document.getElementById('homeVal').innerText=this.value">
-            <div class="slider-label-row"><span>Neutral Ground</span><span>Heavy Stadium Influence</span></div>
-        </div>
+        <label class="checkbox-line">
+          <input type="checkbox" id="includeAI" checked />
+          Add AI match explanation after the math
+        </label>
 
-        <div class="form-group" style="margin-bottom: 20px;">
-            <label>Tactical Setup Override</label>
-            <select id="tacticalSetup">
-                <option value="Balanced System">Standard Balanced System</option>
-                <option value="Gegenpressing Attacking Overload">Gegenpressing Attacking Overload</option>
-                <option value="Low-Block Counter Defensive Structure">Low-Block Counter Defensive Structure</option>
-            </select>
-        </div>
+        <button id="predictBtn" class="primary">Run prediction</button>
+        <p id="status" class="status" role="status"></p>
+      </section>
 
-        <button id="runBtn" onclick="executeModelSimulation()">Initialize Analytical Model</button>
-    </div>
-
-    <div id="modelLoader" class="loader">Executing backend math matrices and querying DeepSeek context framework...</div>
-
-    <div id="workspaceLayout" class="workspace-layout">
-        <div class="panel">
-            <label style="color: #38bdf8; font-size: 14px;">📊 Active Simulation Data Output</label>
-            <div id="simulationOutput" class="output-box"></div>
-        </div>
-
-        <div class="panel">
-            <label>⚡ Inject Dynamic In-Game Scenario Modifier</label>
-            <div class="subtitle" style="text-align: left; margin-bottom: 10px;">Simulate live crises to test model adaptations (e.g., injuries, red cards, weather shifts).</div>
-            <div class="modifier-row">
-                <input type="text" id="eventInput" placeholder="e.g., Home team receives a red card in the 34th minute.">
-                <button id="modifyBtn" onclick="injectScenario()">Recalculate Matrix</button>
+      <section id="results" class="results hidden">
+        <article class="panel scoreboard">
+          <p class="section-label">Prediction</p>
+          <h2 id="matchTitle">Home vs Away</h2>
+          <div class="prob-grid">
+            <div class="prob-box">
+              <span id="homeWinLabel">Home win</span>
+              <strong id="homeWin">--</strong>
             </div>
+            <div class="prob-box">
+              <span>Draw</span>
+              <strong id="draw">--</strong>
+            </div>
+            <div class="prob-box">
+              <span id="awayWinLabel">Away win</span>
+              <strong id="awayWin">--</strong>
+            </div>
+          </div>
+        </article>
+
+        <div class="info-grid">
+          <article class="panel compact-panel">
+            <p class="section-label">Expected goals</p>
+            <p id="expectedGoals" class="large-text">--</p>
+          </article>
+          <article class="panel compact-panel">
+            <p class="section-label">Model details</p>
+            <ul id="modelInfo"></ul>
+          </article>
         </div>
-    </div>
-</div>
 
-<script>
-    const API_BASE = "http://127.0.0.1:8000/api";
-    let messageLog = []; // State logging variable
+        <article class="panel">
+          <p class="section-label">Most likely scorelines</p>
+          <div id="scoreBars"></div>
+        </article>
 
-    async function executeModelSimulation() {
-        const home = document.getElementById('homeTeam').value.trim();
-        const away = document.getElementById('awayTeam').value.trim();
-        if(!home || !away) return alert("Please specify both competition teams.");
+        <article class="panel ai-card">
+          <p class="section-label">AI match note</p>
+          <h3 id="aiHeadline">--</h3>
+          <ul id="aiFactors"></ul>
+          <p id="aiPlain"></p>
+          <p id="aiCaution" class="caution"></p>
+        </article>
+      </section>
+    </main>
 
-        setUiLoading(true);
-        try {
-            const payload = {
-                home_team: home,
-                away_team: away,
-                recency_bias: parseFloat(document.getElementById('recencyBias').value),
-                home_advantage: parseFloat(document.getElementById('homeAdvantage').value),
-                tactical_setup: document.getElementById('tacticalSetup').value
-            };
-
-            const res = await fetch(`${API_BASE}/simulate`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if(!res.ok) throw new Error(`Server status returned error code: ${res.status}`);
-
-            const data = await res.json();
-
-            // Log interaction states to retain context
-            messageLog = [
-                { role: "user", content: `Run model for ${home} vs ${away} with tactical setup: ${payload.tactical_setup}` },
-                { role: "assistant", content: data.analysis_result }
-            ];
-
-            document.getElementById('simulationOutput').innerHTML = marked.parse(data.analysis_result);
-            document.getElementById('setupInterface').style.display = "none";
-            document.getElementById('workspaceLayout').style.display = "block";
-        } catch(e) {
-            alert(`Simulation initialization crash: ${e.message}`);
-        } finally {
-            setUiLoading(false);
-        }
-    }
-
-    async function injectScenario() {
-        const eventText = document.getElementById('eventInput').value.trim();
-        if(!eventText) return;
-
-        document.getElementById('eventInput').value = "";
-        setUiLoading(true);
-
-        try {
-            const res = await fetch(`${API_BASE}/modify-scenario`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ history: messageLog, in_game_event: eventText })
-            });
-            if(!res.ok) throw new Error(`Server status returned error code: ${res.status}`);
-
-            const data = await res.json();
-
-            // Append modified histories onto active memory array
-            messageLog.push({ role: "user", content: `Recalculate with event: ${eventText}` });
-            messageLog.push({ role: "assistant", content: data.analysis_result });
-
-            // Append new analysis onto existing viewport logs cleanly
-            const currentOutput = document.getElementById('simulationOutput');
-            currentOutput.innerHTML += "<hr style='border:1px solid #334155; margin:20px 0;'> " + marked.parse(data.analysis_result);
-            currentOutput.scrollTop = currentOutput.scrollHeight;
-        } catch(e) {
-            alert(`Scenario injection error: ${e.message}`);
-        } finally {
-            setUiLoading(false);
-        }
-    }
-
-    function setUiLoading(isLoading) {
-        document.getElementById('modelLoader').style.display = isLoading ? "block" : "none";
-        document.getElementById('runBtn').disabled = isLoading;
-        document.getElementById('modifyBtn').disabled = isLoading;
-    }
-</script>
-
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
