@@ -1,15 +1,4 @@
-"""Download and normalize Football-Data.co.uk match-result CSV files.
-
-Usage from backend/:
-    python scripts/download_football_data.py
-
-The script writes:
-    data/downloaded_matches.csv
-
-The predictor uses only results columns: Div, Date, HomeTeam, AwayTeam, FTHG,
-FTAG, and FTR. Football-Data.co.uk CSV files include many additional columns;
-this script intentionally ignores them for a classroom-friendly model.
-"""
+"""Download and normalize Football-Data.co.uk match-result CSV files."""
 
 from __future__ import annotations
 
@@ -18,9 +7,6 @@ import io
 import urllib.request
 from pathlib import Path
 
-# Major European first divisions available from Football-Data.co.uk.
-# E0 = England Premier League, SP1 = Spain La Liga, D1 = Germany Bundesliga,
-# I1 = Italy Serie A, F1 = France Ligue 1.
 SEASONS = ["2122", "2223", "2324", "2425", "2526"]
 LEAGUES = {
     "E0": "England - Premier League",

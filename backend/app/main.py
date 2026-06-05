@@ -13,7 +13,6 @@ from .model import SoccerPoissonModel
 
 load_dotenv()
 
-# Default to the downloaded Football-Data.co.uk results file.
 DATA_PATH = Path(os.getenv("DATA_PATH", "./data/downloaded_matches.csv"))
 HALF_LIFE_DAYS = int(os.getenv("HALF_LIFE_DAYS", "365"))
 MODEL = SoccerPoissonModel(DATA_PATH, half_life_days=HALF_LIFE_DAYS)

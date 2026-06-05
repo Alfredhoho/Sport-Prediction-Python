@@ -1,15 +1,4 @@
-"""Soccer prediction model with exponential recency weighting.
-
-This backend is intentionally more than an AI wrapper. It estimates team attack
-and defense strengths from historical full-time scores, gives recent matches
-more weight, then converts expected goals into win/draw/loss probabilities with
-a Poisson score model.
-
-Research influence: Maher (1982), "Modelling association football scores," uses
-team attack and defense strengths in a Poisson model for football scores. This
-example keeps that structure and adds a time-decay weight so recent form matters
-more than older form.
-"""
+"""Soccer prediction model with exponential recency weighting."""
 
 from __future__ import annotations
 
@@ -35,14 +24,6 @@ class TeamProfile:
 
 
 class SoccerPoissonModel:
-    """Predict soccer match outcomes with interpretable Poisson math.
-
-    Args:
-        data_path: CSV file containing Football-Data.co.uk-style columns.
-        max_goals: Highest score considered in the exact score matrix.
-        half_life_days: Exponential-decay half-life. A match this many days older
-            than the newest match has half the weight of the newest match.
-    """
 
     def __init__(self, data_path: str | Path, max_goals: int = 8, half_life_days: int = 365) -> None:
         self.data_path = Path(data_path)
